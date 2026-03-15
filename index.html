@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a2e">
+<title>TravelKit</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap');
+:root{--bg:#f5f0eb;--bg2:#fff;--bgc:#fff;--txt:#1a1a2e;--txt2:#5a5a7a;--txt3:#9a9ab0;--acc:#e07a5f;--accl:#f4a582;--accd:#c25a3f;--ok:#4a9e6f;--okl:#e8f5e9;--brd:#e8e4df;--shd:rgba(26,26,46,.08);--nav:rgba(255,255,255,.92);--inp:#f5f0eb;--err:#d94f4f;--errl:#fdeaea;--ov:rgba(0,0,0,.4);--r:14px;--rs:8px;--st:env(safe-area-inset-top,20px);--sb:env(safe-area-inset-bottom,0px)}
+[data-theme="dark"]{--bg:#0f0f1a;--bg2:#1a1a2e;--bgc:#22223a;--txt:#e8e4df;--txt2:#a0a0be;--txt3:#6a6a8a;--brd:#2e2e4a;--shd:rgba(0,0,0,.3);--nav:rgba(15,15,26,.95);--inp:#1a1a2e;--okl:#1a2e1a;--errl:#2e1a1a;--ov:rgba(0,0,0,.6)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+.hdr{position:fixed;top:0;left:0;right:0;z-index:100;padding:calc(var(--st)+8px) 20px 12px;background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between}
+.hdr-t{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,var(--acc),var(--accd));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ib{width:38px;height:38px;border-radius:50%;border:none;background:var(--inp);color:var(--txt);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;transition:all .2s}
+.ib:active{transform:scale(.92)}
+.ct{padding:calc(var(--st)+70px) 16px calc(90px + var(--sb));max-width:500px;margin:0 auto}
+.bn{position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--brd);padding:6px 0 calc(6px + var(--sb));display:flex;justify-content:space-around}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;color:var(--txt3);font-size:.62rem;font-weight:500;cursor:pointer;padding:4px 8px;transition:color .2s;font-family:'DM Sans',sans-serif}
+.ni svg{width:22px;height:22px}.ni.ac{color:var(--acc)}
+.cd{background:var(--bgc);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 2px 8px var(--shd);border:1px solid var(--brd);transition:background .3s}
+.pg{display:none}.pg.ac{display:block;animation:fi .25s ease}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.sh{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:600;margin-bottom:16px}
+.ss{font-size:.85rem;color:var(--txt2);margin-bottom:16px}
+input[type="text"],input[type="number"],input[type="date"],input[type="time"],input[type="url"],input[type="tel"],select,textarea{width:100%;padding:12px 14px;background:var(--inp);border:1px solid var(--brd);border-radius:var(--rs);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:.95rem;transition:border-color .2s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--acc)}
+textarea{resize:vertical;min-height:60px}
+.ig{margin-bottom:12px}.il{font-size:.78rem;font-weight:500;color:var(--txt2);margin-bottom:5px;display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border-radius:var(--rs);border:none;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn:active{transform:scale(.96)}
+.bp{background:var(--acc);color:#fff;width:100%}.bp:hover{background:var(--accd)}
+.bs{background:var(--inp);color:var(--txt)}.bd{background:var(--err);color:#fff}
+.bsm{padding:8px 14px;font-size:.82rem}
+.pbc{height:8px;background:var(--inp);border-radius:4px;overflow:hidden;margin-top:8px}
+.pbf{height:100%;background:linear-gradient(90deg,var(--ok),#6fbf8a);border-radius:4px;transition:width .4s ease}
+.bb{display:inline-flex;align-items:center;gap:6px;border:none;background:none;color:var(--acc);font-size:.9rem;font-weight:600;cursor:pointer;margin-bottom:12px;padding:4px 0;font-family:'DM Sans',sans-serif}
+
+/* Dashboard */
+.dc-box{text-align:center;padding:28px 16px;background:linear-gradient(135deg,var(--acc),var(--accd));border-radius:var(--r);color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.dc-box::before{content:'';position:absolute;top:-50%;right:-30%;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%}
+.dc-dest{font-size:.85rem;opacity:.9;margin-bottom:4px;font-weight:500}
+.dc-days{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;line-height:1}
+.dc-lbl{font-size:.9rem;margin-top:4px;opacity:.85}
+.dc-dt{font-size:.78rem;opacity:.7;margin-top:6px}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.dw{background:var(--bgc);border-radius:var(--r);padding:14px;border:1px solid var(--brd);box-shadow:0 2px 8px var(--shd)}
+.dw-i{font-size:1.5rem;margin-bottom:6px}
+.dw-l{font-size:.72rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.dw-v{font-size:1.1rem;font-weight:700}.dw-s{font-size:.75rem;color:var(--txt2);margin-top:2px}
+
+/* Pack */
+.pi{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--brd)}
+.pi:last-child{border-bottom:none}
+.pcb{width:22px;height:22px;border-radius:6px;border:2px solid var(--brd);background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0}
+.pcb.ck{background:var(--ok);border-color:var(--ok)}.pcb.ck::after{content:'✓';color:#fff;font-size:.8rem;font-weight:700}
+.pi.ck .pit{text-decoration:line-through;color:var(--txt3)}
+.pit{flex:1;font-size:.9rem}
+.xb{width:28px;height:28px;border:none;background:none;color:var(--txt3);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:all .2s}
+.xb:hover{background:var(--errl);color:var(--err)}
+.ar{display:flex;gap:8px;margin-top:8px}.ar input{flex:1}
+
+/* Docs */
+.dg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dc2{background:var(--bgc);border-radius:var(--r);border:2px dashed var(--brd);padding:20px 12px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;min-height:100px}
+.dc2:active{transform:scale(.97)}
+.dc2.has{border-style:solid;border-color:var(--ok)}
+.dc2 .di{font-size:2rem;margin-bottom:8px}
+.dc2 .dl{font-size:.82rem;font-weight:600;color:var(--txt2)}
+.dc2 .dp{position:absolute;inset:0;object-fit:cover;width:100%;height:100%;border-radius:calc(var(--r) - 2px)}
+.dc2 .dov{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:8px;color:#fff;font-size:.78rem;font-weight:600}
+
+/* Flight */
+.fc{background:var(--bgc);border-radius:var(--r);overflow:hidden;margin-bottom:16px;box-shadow:0 2px 8px var(--shd);border:1px solid var(--brd)}
+.fch{background:linear-gradient(135deg,var(--acc),var(--accd));padding:14px 16px;color:#fff;display:flex;justify-content:space-between;align-items:center}
+.fch .fnr{font-weight:700;font-size:1.1rem}.fch .fdt{font-size:.82rem;opacity:.9}
+.fcb{padding:16px}
+.fr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.fp{text-align:center}.fp .code{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700}
+.fp .city{font-size:.78rem;color:var(--txt2)}.fp .time{font-size:.9rem;font-weight:600;margin-top:4px}
+.fl{flex:1;height:2px;background:var(--brd);margin:0 16px;position:relative}
+.fl::after{content:'✈';position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:1.1rem}
+.fm{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.82rem}
+.fmi{display:flex;flex-direction:column}.fml{color:var(--txt3);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px}
+.fmv{font-weight:600;margin-top:2px}
+
+/* Currency */
+.cud{text-align:center;padding:24px 16px;background:var(--bgc);border-radius:var(--r);box-shadow:0 2px 8px var(--shd);border:1px solid var(--brd);margin-bottom:16px}
+.cui{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;border:none;background:transparent;text-align:center;width:100%;color:var(--txt)}.cui:focus{outline:none}
+.cuc{font-size:.85rem;color:var(--txt2);font-weight:600;margin-top:4px}
+.cusw{width:48px;height:48px;border-radius:50%;background:var(--acc);color:#fff;border:none;font-size:1.3rem;cursor:pointer;margin:12px auto;display:block;box-shadow:0 4px 12px rgba(224,122,95,.3);transition:transform .3s}
+.cusw:active{transform:rotate(180deg)}
+.cur{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--acc);margin:8px 0}
+.crt{font-size:.8rem;color:var(--txt3)}
+
+/* SOS */
+.sc{background:var(--bgc);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid var(--brd);display:flex;align-items:center;gap:14px;transition:all .2s}
+.sc.urg{border-color:var(--err);border-width:2px}
+.si{font-size:1.8rem;flex-shrink:0}
+.sif{flex:1}.slb{font-weight:600;font-size:.9rem}.sdt{font-size:.8rem;color:var(--txt2);margin-top:2px}
+.scl{background:var(--ok);color:#fff;padding:8px 14px;border-radius:20px;border:none;font-weight:600;font-size:.82rem;text-decoration:none;display:inline-block}
+.sc.urg .scl{background:var(--err)}
+
+/* Address */
+.ac2{background:var(--bgc);border-radius:var(--r);padding:14px;margin-bottom:10px;border:1px solid var(--brd);display:flex;align-items:center;gap:12px}
+.anv{width:36px;height:36px;border-radius:50%;background:var(--acc);color:#fff;border:none;font-size:1rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+
+/* More */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mi2{background:var(--bgc);border-radius:var(--r);padding:20px 14px;text-align:center;border:1px solid var(--brd);cursor:pointer;transition:all .2s;box-shadow:0 2px 8px var(--shd)}
+.mi2:active{transform:scale(.96)}
+.mi2 .mii{font-size:2rem;margin-bottom:8px}.mi2 .mil{font-size:.85rem;font-weight:600}
+
+/* Diary */
+.de{background:var(--bgc);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid var(--brd);box-shadow:0 2px 8px var(--shd)}
+.de-dt{font-size:.75rem;color:var(--txt3);font-weight:500;margin-bottom:6px}
+.de-ph{width:100%;border-radius:var(--rs);max-height:200px;object-fit:cover;margin-bottom:8px}
+
+/* Modal */
+.mo{display:none;position:fixed;inset:0;z-index:200;background:var(--ov);align-items:center;justify-content:center;padding:20px}
+.mo.ac{display:flex}
+.moc{background:var(--bgc);border-radius:var(--r);width:100%;max-width:440px;max-height:85vh;overflow:auto}
+.moh{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--brd)}
+.moh h3{font-family:'Playfair Display',serif;font-size:1.1rem}
+.mob{padding:16px}.mob img{width:100%;border-radius:var(--rs)}
+.moa{display:flex;gap:8px;padding:16px;border-top:1px solid var(--brd)}.moa .btn{flex:1}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--txt);color:var(--bg);padding:10px 20px;border-radius:20px;font-size:.85rem;font-weight:500;opacity:0;transition:all .3s;z-index:300;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.copy{text-align:right;padding:16px 4px 8px;font-size:.7rem;color:var(--txt3)}.copy a{color:var(--txt3);text-decoration:none}.copy a:hover{color:var(--acc)}
+</style>
+</head>
+<body>
+<header class="hdr"><div class="hdr-t">TravelKit</div><div><button class="ib" onclick="toggleTheme()" id="themeBtn">🌙</button></div></header>
+<main class="ct">
+
+<!-- HOME -->
+<div id="pg-home" class="pg ac">
+<div class="sh">Dashboard</div>
+<div id="dashCD"></div>
+<div class="dg" id="dashW"></div>
+<div id="dashNF"></div>
+<div class="cd" id="tripSetup">
+<div class="il" style="font-size:.9rem;font-weight:600;margin-bottom:12px">🌍 Reise einrichten</div>
+<div class="ig"><label class="il">Reiseziel</label><input type="text" id="trDest" placeholder="z.B. Aspen, Colorado"></div>
+<div class="ig"><label class="il">Abreisedatum</label><input type="date" id="trDate"></div>
+<div class="ig"><label class="il">Rückreisedatum</label><input type="date" id="trRet"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="ig"><label class="il">Zeitzone Ziel (UTC±)</label><input type="number" id="trTZ" placeholder="-7" step="0.5" min="-12" max="14"></div>
+<div class="ig"><label class="il">Heimat (UTC±)</label><input type="number" id="trHTZ" value="1" step="0.5" min="-12" max="14"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="ig"><label class="il">Breitengrad</label><input type="number" id="trLat" placeholder="39.19" step="0.01"></div>
+<div class="ig"><label class="il">Längengrad</label><input type="number" id="trLng" placeholder="-106.82" step="0.01"></div>
+</div>
+<button class="btn bp" onclick="saveTrip()">Reise speichern</button>
+</div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+<!-- PACK -->
+<div id="pg-pack" class="pg">
+<div class="sh">Packliste</div>
+<div class="cd" id="oP"><div style="display:flex;justify-content:space-between;align-items:center;font-size:.82rem;color:var(--txt2)"><span id="pSt">0/0</span><span style="font-weight:700;font-size:1rem;color:var(--ok)" id="pPc">0%</span></div><div class="pbc"><div class="pbf" id="pBr" style="width:0%"></div></div></div>
+<div id="pCats"></div>
+<div class="cd" style="margin-top:16px"><div class="il">Neue Kategorie</div><div class="ar"><input type="text" id="nCI" placeholder="z.B. 🏔️ Outdoor"><button class="btn bs bsm" style="width:auto;padding:8px 16px" onclick="addCat()">+</button></div></div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+<!-- DOCS -->
+<div id="pg-docs" class="pg">
+<div class="sh">Dokumente</div>
+<div class="ss">Tippe auf ein Feld, um ein Foto zu speichern.</div>
+<div class="dg2" id="docG"></div>
+<div class="cd" style="margin-top:16px"><div class="il">Eigenes Dokument</div><div class="ar"><input type="text" id="nDI" placeholder="z.B. Impfpass"><button class="btn bs bsm" style="width:auto;padding:8px 16px" onclick="addDT()">+</button></div></div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+<!-- FLIGHTS -->
+<div id="pg-fl" class="pg">
+<div class="sh">Fluginfos</div>
+<div id="fList"></div>
+<div class="cd" id="fForm">
+<div class="il" style="font-size:.9rem;font-weight:600;margin-bottom:12px">✈️ Flug hinzufügen</div>
+<div class="ig"><label class="il">Flugnummer</label><input type="text" id="fNr" placeholder="LH 1234"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="ig"><label class="il">Von (Code)</label><input type="text" id="fFr" placeholder="MUC" maxlength="3" style="text-transform:uppercase"></div>
+<div class="ig"><label class="il">Nach (Code)</label><input type="text" id="fTo" placeholder="JFK" maxlength="3" style="text-transform:uppercase"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="ig"><label class="il">Von (Stadt)</label><input type="text" id="fFC" placeholder="München"></div>
+<div class="ig"><label class="il">Nach (Stadt)</label><input type="text" id="fTC" placeholder="New York"></div>
+</div>
+<div class="ig"><label class="il">Datum</label><input type="date" id="fDt"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="ig"><label class="il">Abflug</label><input type="time" id="fDp"></div>
+<div class="ig"><label class="il">Ankunft</label><input type="time" id="fAr"></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div class="ig"><label class="il">Terminal</label><input type="text" id="fTm" placeholder="2"></div>
+<div class="ig"><label class="il">Gate</label><input type="text" id="fGt" placeholder="B42"></div>
+</div>
+<div class="ig"><label class="il">Sitzplatz</label><input type="text" id="fSt" placeholder="14A"></div>
+<div class="ig"><label class="il">Notizen</label><textarea id="fNt" placeholder="z.B. Gepäck 23kg"></textarea></div>
+<button class="btn bp" onclick="saveFL()">Flug speichern</button>
+</div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+<!-- MORE -->
+<div id="pg-more" class="pg">
+<div class="sh">Mehr</div>
+<div class="mg">
+<div class="mi2" onclick="sub('cur')"><div class="mii">💱</div><div class="mil">Währung</div></div>
+<div class="mi2" onclick="sub('dia')"><div class="mii">📝</div><div class="mil">Tagebuch</div></div>
+<div class="mi2" onclick="sub('sos')"><div class="mii">🆘</div><div class="mil">Notfall</div></div>
+<div class="mi2" onclick="sub('adr')"><div class="mii">📍</div><div class="mil">Adressen</div></div>
+<div class="mi2" onclick="sub('bak')"><div class="mii">📤</div><div class="mil">Backup</div></div>
+<div class="mi2" onclick="sub('set')"><div class="mii">⚙️</div><div class="mil">Einstellungen</div></div>
+</div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+<!-- SUB: CURRENCY -->
+<div id="pg-cur" class="pg">
+<button class="bb" onclick="sub('x')">← Zurück</button>
+<div class="sh">Währungsumrechner</div>
+<div style="display:flex;gap:12px;margin-bottom:16px"><select id="cF" onchange="cv()"></select><select id="cT" onchange="cv()"></select></div>
+<div class="cud"><input type="number" class="cui" id="cI" value="100" oninput="cv()" inputmode="decimal"><div class="cuc" id="cFL">EUR</div></div>
+<button class="cusw" onclick="swC()">⇅</button>
+<div class="cud"><div class="cur" id="cR">—</div><div class="cuc" id="cTL">USD</div><div class="crt" id="cRI"></div></div>
+<div class="cd" style="margin-top:12px"><div class="il" style="margin-bottom:8px">💡 Offline: gespeicherte Kurse.</div><button class="btn bs bsm" onclick="fRt()" style="width:100%">Kurse aktualisieren</button><div class="crt" id="rU" style="margin-top:8px;text-align:center"></div></div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+<!-- SUB: DIARY -->
+<div id="pg-dia" class="pg">
+<button class="bb" onclick="sub('x')">← Zurück</button>
+<div class="sh">Reisetagebuch</div>
+<div id="diaE"></div>
+<div class="cd">
+<div class="il" style="font-size:.9rem;font-weight:600;margin-bottom:12px">✍️ Neuer Eintrag</div>
+<div class="ig"><label class="il">Datum</label><input type="date" id="diDt"></div>
+<div class="ig"><label class="il">Titel</label><input type="text" id="diTi" placeholder="z.B. Ankunft in Aspen"></div>
+<div class="ig"><label class="il">Text</label><textarea id="diTx" placeholder="Was hast du erlebt?" style="min-height:100px"></textarea></div>
+<div class="ig"><label class="il">Foto (optional)</label><input type="file" id="diPh" accept="image/*" capture="environment"></div>
+<button class="btn bp" onclick="saveDi()">Eintrag speichern</button>
+</div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+<!-- SUB: SOS -->
+<div id="pg-sos" class="pg">
+<button class="bb" onclick="sub('x')">← Zurück</button>
+<div class="sh">🆘 Notfallkontakte</div>
+<div class="ss">Tippe auf eine Nummer zum Anrufen.</div>
+<div id="sosL"></div>
+<div class="cd" style="margin-top:12px">
+<div class="il" style="font-size:.9rem;font-weight:600;margin-bottom:12px">Kontakt hinzufügen</div>
+<div class="ig"><label class="il">Bezeichnung</label><input type="text" id="soLb" placeholder="z.B. Deutsche Botschaft"></div>
+<div class="ig"><label class="il">Telefon</label><input type="tel" id="soPh" placeholder="+1 212 555 1234"></div>
+<div class="ig"><label class="il">Details</label><input type="text" id="soDt" placeholder="Optional"></div>
+<div class="ig"><label class="il">Icon</label><select id="soIc"><option value="🏥">🏥 Krankenhaus</option><option value="🏛️">🏛️ Botschaft</option><option value="👮">👮 Polizei</option><option value="🚒">🚒 Feuerwehr</option><option value="📞">📞 Hotline</option><option value="🛡️">🛡️ Versicherung</option><option value="👤">👤 Person</option><option value="✈️">✈️ Airline</option></select></div>
+<div class="ig"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="soUr"><span class="il" style="margin:0">Dringend</span></label></div>
+<button class="btn bp" onclick="saveSo()">Speichern</button>
+</div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+<!-- SUB: ADDRESSES -->
+<div id="pg-adr" class="pg">
+<button class="bb" onclick="sub('x')">← Zurück</button>
+<div class="sh">📍 Wichtige Adressen</div>
+<div id="adrL"></div>
+<div class="cd" style="margin-top:12px">
+<div class="il" style="font-size:.9rem;font-weight:600;margin-bottom:12px">Adresse hinzufügen</div>
+<div class="ig"><label class="il">Bezeichnung</label><input type="text" id="adLb" placeholder="z.B. Hotel"></div>
+<div class="ig"><label class="il">Adresse</label><input type="text" id="adAd" placeholder="123 Main St, Aspen"></div>
+<div class="ig"><label class="il">Icon</label><select id="adIc"><option value="🏨">🏨 Hotel</option><option value="🍽️">🍽️ Restaurant</option><option value="🏫">🏫 Schule</option><option value="✈️">✈️ Flughafen</option><option value="🏥">🏥 Krankenhaus</option><option value="🏛️">🏛️ Botschaft</option><option value="🏠">🏠 Gastfamilie</option><option value="🎿">🎿 Skigebiet</option><option value="📍">📍 Sonstiges</option></select></div>
+<div class="ig"><label class="il">Notizen</label><input type="text" id="adNt" placeholder="Optional"></div>
+<button class="btn bp" onclick="saveAd()">Speichern</button>
+</div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+<!-- SUB: BACKUP -->
+<div id="pg-bak" class="pg">
+<button class="bb" onclick="sub('x')">← Zurück</button>
+<div class="sh">📤 Backup & Daten</div>
+<div class="cd"><div class="il" style="font-size:.9rem;font-weight:600;margin-bottom:8px">Daten exportieren</div><div class="ss">Alle Daten als JSON-Datei speichern.</div><button class="btn bp" onclick="expD()">💾 Backup herunterladen</button></div>
+<div class="cd"><div class="il" style="font-size:.9rem;font-weight:600;margin-bottom:8px">Daten importieren</div><div class="ss">Backup hochladen. Bestehende Daten werden überschrieben!</div><input type="file" id="impF" accept=".json" style="margin-bottom:12px"><button class="btn bd" onclick="impD()" style="width:100%">📥 Backup einspielen</button></div>
+<div class="cd"><div class="il" style="font-size:.9rem;font-weight:600;margin-bottom:8px;color:var(--err)">⚠️ Alle Daten löschen</div><button class="btn bd" onclick="rstAll()" style="width:100%">🗑️ Komplett zurücksetzen</button></div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+<!-- SUB: SETTINGS -->
+<div id="pg-set" class="pg">
+<button class="bb" onclick="sub('x')">← Zurück</button>
+<div class="sh">⚙️ Einstellungen</div>
+<div class="cd"><button class="btn bs" onclick="editTr()" style="width:100%">✏️ Reisedaten ändern</button></div>
+<div class="cd"><button class="btn bd" onclick="rstPk()" style="width:100%">Alle Häkchen entfernen</button></div>
+<div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
+</div>
+
+</main>
+
+<nav class="bn">
+<button class="ni ac" data-p="home" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home</button>
+<button class="ni" data-p="pack" onclick="go('pack')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M12 12v3"/></svg>Packliste</button>
+<button class="ni" data-p="docs" onclick="go('docs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>Docs</button>
+<button class="ni" data-p="fl" onclick="go('fl')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>Flüge</button>
+<button class="ni" data-p="more" onclick="go('more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>Mehr</button>
+</nav>
+
+<div class="mo" id="dMo"><div class="moc"><div class="moh"><h3 id="dMoT">Dokument</h3><button class="ib" onclick="clMo()">✕</button></div><div class="mob" id="dMoB"></div><div class="moa" id="dMoA"></div></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="fIn" accept="image/*" capture="environment" style="display:none">
+
+<script>
+const DB='TravelKitDB';let db=null;
+function oDB(){return new Promise((r,j)=>{const q=indexedDB.open(DB,2);q.onupgradeneeded=e=>{const d=e.target.result;['documents','diary'].forEach(s=>{if(!d.objectStoreNames.contains(s))d.createObjectStore(s,{keyPath:'id'})})};q.onsuccess=e=>{db=e.target.result;r(db)};q.onerror=e=>j(e.target.error)})}
+function dP(s,d){return new Promise((r,j)=>{const t=db.transaction(s,'readwrite');t.objectStore(s).put(d);t.oncomplete=()=>r();t.onerror=e=>j(e.target.error)})}
+function dG(s,k){return new Promise((r,j)=>{const t=db.transaction(s,'readonly');const q=t.objectStore(s).get(k);q.onsuccess=()=>r(q.result);q.onerror=e=>j(e.target.error)})}
+function dD(s,k){return new Promise((r,j)=>{const t=db.transaction(s,'readwrite');t.objectStore(s).delete(k);t.oncomplete=()=>r();t.onerror=e=>j(e.target.error)})}
+function dA(s){return new Promise((r,j)=>{const t=db.transaction(s,'readonly');const q=t.objectStore(s).getAll();q.onsuccess=()=>r(q.result);q.onerror=e=>j(e.target.error)})}
+const L=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))||f}catch{return f}};
+const S=(k,d)=>localStorage.setItem(k,JSON.stringify(d));
+const $=id=>document.getElementById(id);
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+
+// THEME
+function toggleTheme(){const d=document.documentElement.getAttribute('data-theme')==='dark';document.documentElement.setAttribute('data-theme',d?'light':'dark');localStorage.setItem('theme',d?'light':'dark');$('themeBtn').textContent=d?'🌙':'☀️'}
+(()=>{const t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);$('themeBtn').textContent=t==='dark'?'☀️':'🌙'})();
+
+// NAV
+let lastM='more';
+function go(p){document.querySelectorAll('.pg').forEach(x=>x.classList.remove('ac'));$('pg-'+p).classList.add('ac');document.querySelectorAll('.ni').forEach(n=>n.classList.remove('ac'));const nb=document.querySelector(`.ni[data-p="${p}"]`);if(nb)nb.classList.add('ac');if(['home','pack','docs','fl','more'].includes(p))lastM=p}
+function sub(p){if(p==='x'){go(lastM);return}document.querySelectorAll('.pg').forEach(x=>x.classList.remove('ac'));$('pg-'+p).classList.add('ac')}
+
+// ═══ DASHBOARD ═══
+let trip=L('trip',null);
+function rDash(){
+  const cd=$('dashCD'),wg=$('dashW'),nf=$('dashNF'),su=$('tripSetup');
+  if(!trip){cd.innerHTML='<div style="text-align:center;padding:32px;color:var(--txt3)"><div style="font-size:2.5rem;margin-bottom:8px">🌍</div><p>Richte deine Reise ein!</p></div>';wg.innerHTML='';nf.innerHTML='';su.style.display='';return}
+  su.style.display='none';
+  const dep=new Date(trip.date+'T00:00:00'),now=new Date(),df=Math.ceil((dep-now)/864e5);
+  const ret=trip.ret?new Date(trip.ret+'T00:00:00'):null,rd=ret?Math.ceil((ret-now)/864e5):null;
+  let ct,cl,cs='';
+  if(df>0){ct=df;cl='Tage bis zur Abreise';cs=dep.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+  else if(df===0){ct='🎉';cl='Heute geht\'s los!';cs='Gute Reise!'}
+  else if(rd!==null&&rd>=0){ct=rd;cl='Tage verbleibend';cs='Du bist unterwegs!'}
+  else{ct='✓';cl='Reise beendet';cs='Willkommen zurück!'}
+  cd.innerHTML=`<div class="dc-box"><div class="dc-dest">${trip.dest||'Reise'}</div><div class="dc-days">${ct}</div><div class="dc-lbl">${cl}</div><div class="dc-dt">${cs}</div></div>`;
+  let w='';
+  if(trip.tz!==undefined&&trip.tz!==''&&trip.htz!==undefined){
+    const nu=new Date(now.getTime()+now.getTimezoneOffset()*6e4);
+    const dt=new Date(nu.getTime()+parseFloat(trip.tz)*36e5);
+    const ht=new Date(nu.getTime()+parseFloat(trip.htz)*36e5);
+    const dh=parseFloat(trip.tz)-parseFloat(trip.htz);
+    w+=`<div class="dw"><div class="dw-i">🕐</div><div class="dw-l">Zielort</div><div class="dw-v">${dt.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}</div><div class="dw-s">Heimat: ${ht.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} (${dh>=0?'+':''}${dh}h)</div></div>`}
+  w+=`<div class="dw" id="wW"><div class="dw-i">🌤️</div><div class="dw-l">Wetter ${trip.dest||''}</div><div class="dw-v" id="wT">—</div><div class="dw-s" id="wD">Lade...</div></div>`;
+  const pa=L('packData',[]);let tl=0,ck=0;pa.forEach(c=>{tl+=c.items.length;ck+=c.items.filter(i=>i.checked).length});const pc=tl>0?Math.round(ck/tl*100):0;
+  w+=`<div class="dw"><div class="dw-i">📦</div><div class="dw-l">Gepackt</div><div class="dw-v" style="color:var(--ok)">${pc}%</div><div class="dw-s">${ck}/${tl} Items</div></div>`;
+  w+=`<div class="dw"><div class="dw-i">📄</div><div class="dw-l">Dokumente</div><div class="dw-v" id="dcW">—</div><div class="dw-s">gespeichert</div></div>`;
+  wg.innerHTML=w;
+  const fl=L('flights',[]),up=fl.filter(f=>f.date&&f.date>=now.toISOString().slice(0,10)).sort((a,b)=>a.date.localeCompare(b.date));
+  if(up.length){const f=up[0];const fd=new Date(f.date+'T00:00:00').toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'});nf.innerHTML=`<div class="fc" style="margin-top:4px"><div class="fch"><span class="fnr">${f.nr||'—'}</span><span class="fdt">${fd}</span></div><div class="fcb"><div class="fr"><div class="fp"><div class="code">${f.from||'—'}</div><div class="city">${f.fromCity||''}</div><div class="time">${f.dep||'—'}</div></div><div class="fl"></div><div class="fp"><div class="code">${f.to||'—'}</div><div class="city">${f.toCity||''}</div><div class="time">${f.arr||'—'}</div></div></div></div></div>`}else{nf.innerHTML=''}
+  if(trip.lat&&trip.lng)fWe(trip.lat,trip.lng);
+  cntD();
+}
+async function cntD(){try{const a=await dA('documents');if($('dcW'))$('dcW').textContent=a.length}catch{}}
+async function fWe(la,ln){try{const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${ln}&current=temperature_2m,weather_code&timezone=auto`);const d=await r.json();if(d.current){$('wT').textContent=Math.round(d.current.temperature_2m)+'°C';$('wD').textContent=wLb(d.current.weather_code)}}catch{if($('wD'))$('wD').textContent='Offline'}}
+function wLb(c){const m={0:'Klar ☀️',1:'Überwiegend klar',2:'Teilw. bewölkt ⛅',3:'Bewölkt ☁️',45:'Nebel 🌫️',48:'Reifnebel',51:'Leichter Niesel',53:'Niesel',55:'Starker Niesel',61:'Leichter Regen 🌧️',63:'Regen 🌧️',65:'Starkregen',71:'Leichter Schnee ❄️',73:'Schnee ❄️',75:'Starker Schnee',80:'Schauer',85:'Schneeschauer',95:'Gewitter ⛈️'};return m[c]||'—'}
+function saveTrip(){trip={dest:$('trDest').value.trim(),date:$('trDate').value,ret:$('trRet').value,tz:$('trTZ').value,htz:$('trHTZ').value,lat:$('trLat').value,lng:$('trLng').value};S('trip',trip);rDash();toast('Reise gespeichert!')}
+function editTr(){if(trip){$('trDest').value=trip.dest||'';$('trDate').value=trip.date||'';$('trRet').value=trip.ret||'';$('trTZ').value=trip.tz||'';$('trHTZ').value=trip.htz||1;$('trLat').value=trip.lat||'';$('trLng').value=trip.lng||''}$('tripSetup').style.display='';go('home')}
+setInterval(()=>{if($('pg-home').classList.contains('ac'))rDash()},6e4);
+
+// ═══ PACKLISTE ═══
+const DP=[{id:'clothes',name:'👕 Kleidung',items:[{id:'c1',text:'T-Shirts',checked:false},{id:'c2',text:'Hosen',checked:false},{id:'c3',text:'Unterwäsche',checked:false},{id:'c4',text:'Socken',checked:false},{id:'c5',text:'Jacke',checked:false}]},{id:'toiletries',name:'🧴 Hygiene',items:[{id:'t1',text:'Zahnbürste & Zahnpasta',checked:false},{id:'t2',text:'Shampoo',checked:false},{id:'t3',text:'Deo',checked:false},{id:'t4',text:'Sonnencreme',checked:false}]},{id:'tech',name:'📱 Technik',items:[{id:'e1',text:'Ladekabel',checked:false},{id:'e2',text:'Powerbank',checked:false},{id:'e3',text:'Kopfhörer',checked:false},{id:'e4',text:'Adapter',checked:false}]},{id:'docs',name:'📄 Dokumente',items:[{id:'d1',text:'Reisepass',checked:false},{id:'d2',text:'Führerschein',checked:false},{id:'d3',text:'Flugtickets',checked:false},{id:'d4',text:'Versicherung',checked:false}]},{id:'misc',name:'🎒 Sonstiges',items:[{id:'m1',text:'Reiseapotheke',checked:false},{id:'m2',text:'Snacks',checked:false},{id:'m3',text:'Nackenkissen',checked:false}]}];
+let pk=L('packData',DP);
+function rPk(){const c=$('pCats');let T=0,C=0,h='';pk.forEach((ct,ci)=>{const cc=ct.items.filter(i=>i.checked).length;T+=ct.items.length;C+=cc;h+=`<div class="cd"><div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;cursor:pointer" onclick="tgC(${ci})"><div style="font-weight:600;font-size:.95rem">${ct.name}</div><span style="font-size:.78rem;color:var(--txt3)">${cc}/${ct.items.length}</span></div><div id="ct-${ci}">`;ct.items.forEach((it,ii)=>{h+=`<div class="pi ${it.checked?'ck':''}"><div class="pcb ${it.checked?'ck':''}" onclick="tgI(${ci},${ii})"></div><span class="pit">${it.text}</span><button class="xb" onclick="dI(${ci},${ii})">×</button></div>`});h+=`<div class="ar"><input type="text" placeholder="Neues Item..." id="ni-${ci}" onkeydown="if(event.key==='Enter')aI(${ci})"><button class="btn bs bsm" style="width:auto" onclick="aI(${ci})">+</button></div></div></div>`});c.innerHTML=h;const p=T>0?Math.round(C/T*100):0;$('pSt').textContent=`${C} von ${T} gepackt`;$('pPc').textContent=p+'%';$('pBr').style.width=p+'%'}
+function tgI(ci,ii){pk[ci].items[ii].checked=!pk[ci].items[ii].checked;S('packData',pk);rPk()}
+function dI(ci,ii){pk[ci].items.splice(ii,1);if(!pk[ci].items.length)pk.splice(ci,1);S('packData',pk);rPk()}
+function aI(ci){const inp=$('ni-'+ci);const t=inp.value.trim();if(!t)return;pk[ci].items.push({id:'u'+Date.now(),text:t,checked:false});S('packData',pk);rPk();toast('Hinzugefügt')}
+function addCat(){const inp=$('nCI');const n=inp.value.trim();if(!n)return;pk.push({id:'c'+Date.now(),name:n,items:[]});S('packData',pk);inp.value='';rPk();toast('Kategorie erstellt')}
+function tgC(ci){const e=$('ct-'+ci);e.style.display=e.style.display==='none'?'':'none'}
+function rstPk(){if(!confirm('Alle Häkchen entfernen?'))return;pk.forEach(c=>c.items.forEach(i=>i.checked=false));S('packData',pk);rPk();toast('Zurückgesetzt')}
+
+// ═══ DOKUMENTE ═══
+const DD=[{id:'pass',label:'Reisepass',icon:'🛂'},{id:'fs',label:'Führerschein',icon:'🪪'},{id:'ft',label:'Flugticket',icon:'✈️'},{id:'esta',label:'ESTA',icon:'🇺🇸'},{id:'vers',label:'Versicherung',icon:'🏥'},{id:'hotel',label:'Hotel',icon:'🏨'}];
+let dt=L('docTypes',DD);let cDI=null;
+async function rDc(){const g=$('docG');let h='';for(const d of dt){let img=null;try{const r=await dG('documents',d.id);if(r)img=r.data}catch{};if(img){h+=`<div class="dc2 has" onclick="vDoc('${d.id}')"><img class="dp" src="${img}" alt="${d.label}"><div class="dov">${d.label}</div></div>`}else{h+=`<div class="dc2" onclick="cDoc('${d.id}')"><div class="di">${d.icon}</div><div class="dl">${d.label}</div></div>`}}g.innerHTML=h}
+function cDoc(id){cDI=id;$('fIn').click()}
+$('fIn').addEventListener('change',async e=>{const f=e.target.files[0];if(!f||!cDI)return;const r=new FileReader();r.onload=async ev=>{await dP('documents',{id:cDI,data:ev.target.result,date:new Date().toISOString()});rDc();toast('Gespeichert')};r.readAsDataURL(f);e.target.value=''});
+async function vDoc(id){const r=await dG('documents',id);if(!r)return;const d=dt.find(x=>x.id===id);$('dMoT').textContent=d?d.label:'Dokument';$('dMoB').innerHTML=`<img src="${r.data}" style="width:100%;border-radius:8px">`;$('dMoA').innerHTML=`<button class="btn bs" onclick="cDoc('${id}');clMo()">Ersetzen</button><button class="btn bd" onclick="ddDoc('${id}')">Löschen</button>`;$('dMo').classList.add('ac')}
+function clMo(){$('dMo').classList.remove('ac')}
+async function ddDoc(id){await dD('documents',id);clMo();rDc();toast('Gelöscht')}
+function addDT(){const inp=$('nDI');const l=inp.value.trim();if(!l)return;dt.push({id:'d'+Date.now(),label:l,icon:'📎'});S('docTypes',dt);inp.value='';rDc();toast('Hinzugefügt')}
+$('dMo').addEventListener('click',e=>{if(e.target.id==='dMo')clMo()});
+
+// ═══ FLÜGE ═══
+let fl=L('flights',[]);
+function rFL(){const c=$('fList');if(!fl.length){c.innerHTML='<div style="text-align:center;padding:40px;color:var(--txt3)"><div style="font-size:3rem;margin-bottom:12px">✈️</div><p>Noch keine Flüge.</p></div>';return}const s=[...fl].sort((a,b)=>(a.date||'').localeCompare(b.date||''));let h='';s.forEach(f=>{const ri=fl.indexOf(f);const ds=f.date?new Date(f.date+'T00:00:00').toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):'—';h+=`<div class="fc"><div class="fch"><span class="fnr">${f.nr||'—'}</span><span class="fdt">${ds}</span></div><div class="fcb"><div class="fr"><div class="fp"><div class="code">${f.from||'—'}</div><div class="city">${f.fromCity||''}</div><div class="time">${f.dep||'—'}</div></div><div class="fl"></div><div class="fp"><div class="code">${f.to||'—'}</div><div class="city">${f.toCity||''}</div><div class="time">${f.arr||'—'}</div></div></div><div class="fm">${f.terminal?`<div class="fmi"><span class="fml">Terminal</span><span class="fmv">${f.terminal}</span></div>`:''}${f.gate?`<div class="fmi"><span class="fml">Gate</span><span class="fmv">${f.gate}</span></div>`:''}${f.seat?`<div class="fmi"><span class="fml">Sitz</span><span class="fmv">${f.seat}</span></div>`:''}</div>${f.notes?`<div style="margin-top:10px;font-size:.82rem;color:var(--txt2);background:var(--inp);padding:8px 12px;border-radius:8px">📝 ${f.notes}</div>`:''}<div style="display:flex;gap:8px;margin-top:12px"><button class="btn bs bsm" style="flex:1" onclick="eFl(${ri})">✏️</button><button class="btn bd bsm" style="flex:1" onclick="dFl(${ri})">🗑️</button></div></div></div>`});c.innerHTML=h}
+function saveFL(){const f={nr:$('fNr').value.trim(),from:$('fFr').value.trim().toUpperCase(),to:$('fTo').value.trim().toUpperCase(),fromCity:$('fFC').value.trim(),toCity:$('fTC').value.trim(),date:$('fDt').value,dep:$('fDp').value,arr:$('fAr').value,terminal:$('fTm').value.trim(),gate:$('fGt').value.trim(),seat:$('fSt').value.trim(),notes:$('fNt').value.trim()};if(!f.nr&&!f.from&&!f.to){toast('Bitte Flugnr. oder Route');return}const ei=$('fForm').dataset.ei;if(ei!==undefined&&ei!==''){fl[parseInt(ei)]=f;delete $('fForm').dataset.ei}else{fl.push(f)}S('flights',fl);cFL();rFL();toast('Flug gespeichert')}
+function eFl(i){const f=fl[i];$('fNr').value=f.nr||'';$('fFr').value=f.from||'';$('fTo').value=f.to||'';$('fFC').value=f.fromCity||'';$('fTC').value=f.toCity||'';$('fDt').value=f.date||'';$('fDp').value=f.dep||'';$('fAr').value=f.arr||'';$('fTm').value=f.terminal||'';$('fGt').value=f.gate||'';$('fSt').value=f.seat||'';$('fNt').value=f.notes||'';$('fForm').dataset.ei=i;$('fForm').scrollIntoView({behavior:'smooth'})}
+function dFl(i){if(confirm('Flug löschen?')){fl.splice(i,1);S('flights',fl);rFL();toast('Gelöscht')}}
+function cFL(){['fNr','fFr','fTo','fFC','fTC','fDt','fDp','fAr','fTm','fGt','fSt','fNt'].forEach(id=>$(id).value='')}
+
+// ═══ WÄHRUNG ═══
+const CU=[{c:'EUR',n:'Euro',s:'€'},{c:'USD',n:'US Dollar',s:'$'},{c:'GBP',n:'Brit. Pfund',s:'£'},{c:'CHF',n:'Schweizer Fr.',s:'Fr'},{c:'JPY',n:'Yen',s:'¥'},{c:'CAD',n:'Kanad. Dollar',s:'C$'},{c:'AUD',n:'Austr. Dollar',s:'A$'},{c:'SEK',n:'Schwed. Krone',s:'kr'},{c:'NOK',n:'Norw. Krone',s:'kr'},{c:'DKK',n:'Dän. Krone',s:'kr'},{c:'CZK',n:'Tschech. Krone',s:'Kč'},{c:'PLN',n:'Zloty',s:'zł'},{c:'HUF',n:'Forint',s:'Ft'},{c:'TRY',n:'Türk. Lira',s:'₺'},{c:'THB',n:'Baht',s:'฿'},{c:'MXN',n:'Mex. Peso',s:'$'},{c:'BRL',n:'Real',s:'R$'},{c:'ZAR',n:'Rand',s:'R'},{c:'INR',n:'Rupie',s:'₹'},{c:'CNY',n:'Yuan',s:'¥'}];
+const FR={EUR:1,USD:1.08,GBP:0.86,CHF:0.95,JPY:162.5,CAD:1.47,AUD:1.66,SEK:11.2,NOK:11.5,DKK:7.46,CZK:25.2,PLN:4.32,HUF:393,TRY:34.8,THB:37.5,MXN:18.5,BRL:5.35,ZAR:19.8,INR:91.5,CNY:7.82};
+let rt=L('curRates',FR);
+function iCu(){const f=$('cF'),t=$('cT');CU.forEach(c=>{f.innerHTML+=`<option value="${c.c}" ${c.c==='EUR'?'selected':''}>${c.c} – ${c.n}</option>`;t.innerHTML+=`<option value="${c.c}" ${c.c==='USD'?'selected':''}>${c.c} – ${c.n}</option>`});cv()}
+function cv(){const fr=$('cF').value,to=$('cT').value,am=parseFloat($('cI').value)||0;const res=(am/(rt[fr]||1))*(rt[to]||1);const tc=CU.find(c=>c.c===to),fc=CU.find(c=>c.c===fr);$('cR').textContent=res.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});$('cFL').textContent=`${fc?.s||''} ${fr}`;$('cTL').textContent=`${tc?.s||''} ${to}`;$('cRI').textContent=`1 ${fr} = ${((rt[to]||1)/(rt[fr]||1)).toFixed(4)} ${to}`}
+function swC(){const f=$('cF'),t=$('cT');const tmp=f.value;f.value=t.value;t.value=tmp;cv()}
+async function fRt(){$('rU').textContent='Lade...';try{const r=await fetch('https://api.exchangerate-api.com/v4/latest/EUR');const d=await r.json();if(d?.rates){rt=d.rates;rt.EUR=1;S('curRates',rt);S('curRatesDate',new Date().toISOString());$('rU').textContent='✅ '+new Date().toLocaleString('de-DE');cv();toast('Kurse aktualisiert')}}catch{$('rU').textContent='⚠️ Offline'}}
+
+// ═══ TAGEBUCH ═══
+async function rDi(){const c=$('diaE');const en=await dA('diary');en.sort((a,b)=>(b.date||'').localeCompare(a.date||''));if(!en.length){c.innerHTML='<div style="text-align:center;padding:24px;color:var(--txt3)">📝 Noch keine Einträge.</div>';return}let h='';en.forEach(e=>{const ds=e.date?new Date(e.date+'T00:00:00').toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';h+=`<div class="de">${ds?`<div class="de-dt">${ds}</div>`:''}${e.title?`<div style="font-weight:600;font-size:1rem;margin-bottom:6px">${e.title}</div>`:''}${e.photo?`<img class="de-ph" src="${e.photo}">`:''}${e.text?`<div style="font-size:.9rem;line-height:1.5">${e.text.replace(/\n/g,'<br>')}</div>`:''}<div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="btn bd bsm" onclick="dDi('${e.id}')">🗑️</button></div></div>`});c.innerHTML=h}
+async function saveDi(){const en={id:'d'+Date.now(),date:$('diDt').value,title:$('diTi').value.trim(),text:$('diTx').value.trim()};const pf=$('diPh').files[0];if(pf){en.photo=await new Promise(r=>{const rd=new FileReader();rd.onload=e=>r(e.target.result);rd.readAsDataURL(pf)})}if(!en.title&&!en.text){toast('Titel oder Text nötig');return}await dP('diary',en);$('diDt').value=new Date().toISOString().slice(0,10);$('diTi').value='';$('diTx').value='';$('diPh').value='';rDi();toast('Eintrag gespeichert')}
+async function dDi(id){if(confirm('Eintrag löschen?')){await dD('diary',id);rDi();toast('Gelöscht')}}
+
+// ═══ NOTFALL ═══
+const DSO=[{id:'s1',label:'Notruf (International)',phone:'112',detail:'Polizei, Feuerwehr, Rettung',icon:'🚨',urgent:true},{id:'s2',label:'Notruf USA',phone:'911',detail:'Emergency Services',icon:'🚨',urgent:true}];
+let so=L('sosList',DSO);
+function rSo(){const c=$('sosL');let h='';so.forEach((s,i)=>{h+=`<div class="sc ${s.urgent?'urg':''}"><div class="si">${s.icon||'📞'}</div><div class="sif"><div class="slb">${s.label}</div><div class="sdt">${s.detail||''}</div></div><a href="tel:${s.phone}" class="scl">${s.phone}</a><button class="xb" onclick="dSo(${i})" style="margin-left:4px">×</button></div>`});c.innerHTML=h}
+function saveSo(){const s={id:'s'+Date.now(),label:$('soLb').value.trim(),phone:$('soPh').value.trim(),detail:$('soDt').value.trim(),icon:$('soIc').value,urgent:$('soUr').checked};if(!s.label||!s.phone){toast('Bezeichnung und Nummer nötig');return}so.push(s);S('sosList',so);$('soLb').value='';$('soPh').value='';$('soDt').value='';$('soUr').checked=false;rSo();toast('Gespeichert')}
+function dSo(i){so.splice(i,1);S('sosList',so);rSo();toast('Gelöscht')}
+
+// ═══ ADRESSEN ═══
+let ad=L('addrList',[]);
+function rAd(){const c=$('adrL');if(!ad.length){c.innerHTML='<div style="text-align:center;padding:24px;color:var(--txt3)">📍 Noch keine Adressen.</div>';return}let h='';ad.forEach((a,i)=>{const mu=`https://maps.apple.com/?q=${encodeURIComponent(a.address||a.label)}`;h+=`<div class="ac2"><div style="font-size:1.5rem;flex-shrink:0">${a.icon||'📍'}</div><div style="flex:1"><div style="font-weight:600;font-size:.9rem">${a.label}</div><div style="font-size:.8rem;color:var(--txt2);margin-top:2px">${a.address||''}</div>${a.notes?`<div style="font-size:.75rem;color:var(--txt3);margin-top:2px">${a.notes}</div>`:''}</div><a href="${mu}" target="_blank" class="anv">🗺️</a><button class="xb" onclick="dAd(${i})">×</button></div>`});c.innerHTML=h}
+function saveAd(){const a={id:'a'+Date.now(),label:$('adLb').value.trim(),address:$('adAd').value.trim(),icon:$('adIc').value,notes:$('adNt').value.trim()};if(!a.label){toast('Bezeichnung nötig');return}ad.push(a);S('addrList',ad);$('adLb').value='';$('adAd').value='';$('adNt').value='';rAd();toast('Gespeichert')}
+function dAd(i){ad.splice(i,1);S('addrList',ad);rAd();toast('Gelöscht')}
+
+// ═══ BACKUP ═══
+async function expD(){const data={trip,packData:pk,docTypes:dt,flights:fl,sosList:so,addrList:ad,curRates:rt,curRatesDate:L('curRatesDate',null)};try{data.diary=await dA('diary')}catch{data.diary=[]}try{data.documents=await dA('documents')}catch{data.documents=[]}const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`TravelKit_Backup_${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url);toast('Backup heruntergeladen')}
+async function impD(){const file=$('impF').files[0];if(!file){toast('Keine Datei');return}if(!confirm('Daten überschreiben?'))return;try{const t=await file.text();const d=JSON.parse(t);if(d.trip){trip=d.trip;S('trip',trip)}if(d.packData){pk=d.packData;S('packData',pk)}if(d.docTypes){dt=d.docTypes;S('docTypes',dt)}if(d.flights){fl=d.flights;S('flights',fl)}if(d.sosList){so=d.sosList;S('sosList',so)}if(d.addrList){ad=d.addrList;S('addrList',ad)}if(d.curRates){rt=d.curRates;S('curRates',rt)}if(d.diary)for(const e of d.diary)await dP('diary',e);if(d.documents)for(const e of d.documents)await dP('documents',e);initAll();toast('Backup eingespielt!')}catch{toast('Ungültige Datei')}}
+function rstAll(){if(!confirm('ALLE Daten löschen?'))return;if(!confirm('Letzte Chance!'))return;localStorage.clear();indexedDB.deleteDatabase(DB);location.reload()}
+
+// ═══ INIT ═══
+async function initAll(){await oDB();rDash();rPk();rDc();rFL();iCu();rSo();rAd();rDi();const lu=L('curRatesDate',null);if(lu)$('rU').textContent='Update: '+new Date(lu).toLocaleDateString('de-DE');$('diDt').value=new Date().toISOString().slice(0,10)}
+initAll();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
