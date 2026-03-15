@@ -247,7 +247,7 @@ textarea{resize:vertical;min-height:60px}
 <div class="ig"><label class="il">Datum</label><input type="date" id="diDt"></div>
 <div class="ig"><label class="il">Titel</label><input type="text" id="diTi" placeholder="z.B. Ankunft in Aspen"></div>
 <div class="ig"><label class="il">Text</label><textarea id="diTx" placeholder="Was hast du erlebt?" style="min-height:100px"></textarea></div>
-<div class="ig"><label class="il">Foto (optional)</label><input type="file" id="diPh" accept="image/*" capture="environment"></div>
+<div class="ig"><label class="il">Foto (optional)</label><input type="file" id="diPh" accept="image/*"></div>
 <button class="btn bp" onclick="saveDi()">Eintrag speichern</button>
 </div>
 <div class="copy">Copyright: <a href="mailto:nimrip@web.de">T. Kaufmann</a></div>
@@ -318,7 +318,7 @@ textarea{resize:vertical;min-height:60px}
 
 <div class="mo" id="dMo"><div class="moc"><div class="moh"><h3 id="dMoT">Dokument</h3><button class="ib" onclick="clMo()">✕</button></div><div class="mob" id="dMoB"></div><div class="moa" id="dMoA"></div></div></div>
 <div class="toast" id="toast"></div>
-<input type="file" id="fIn" accept="image/*" capture="environment" style="display:none">
+<input type="file" id="fIn" accept="image/*" style="display:none">
 
 <script>
 const DB='TravelKitDB';let db=null;
