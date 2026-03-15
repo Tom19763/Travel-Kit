@@ -89,6 +89,40 @@ textarea{resize:vertical;min-height:60px}
 .fmi{display:flex;flex-direction:column}.fml{color:var(--txt3);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px}
 .fmv{font-weight:600;margin-top:2px}
 
+/* Flight Countdown Dashboard */
+.fcd{background:var(--bgc);border-radius:var(--r);overflow:hidden;margin-bottom:16px;border:1px solid var(--brd);box-shadow:0 4px 16px var(--shd)}
+.fcd-top{background:linear-gradient(135deg,#1a1a2e,#2d2d50);padding:20px;color:#fff;position:relative;overflow:hidden}
+[data-theme="dark"] .fcd-top{background:linear-gradient(135deg,#2d2d50,#3a3a60)}
+.fcd-top::before{content:'';position:absolute;top:-40%;right:-20%;width:180px;height:180px;background:rgba(224,122,95,.15);border-radius:50%}
+.fcd-top::after{content:'';position:absolute;bottom:-30%;left:-10%;width:120px;height:120px;background:rgba(224,122,95,.08);border-radius:50%}
+.fcd-label{font-size:.72rem;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:4px}
+.fcd-nr{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.fcd-nr .fcd-badge{background:var(--acc);padding:3px 10px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600}
+.fcd-route{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.fcd-apt{text-align:center}
+.fcd-apt .code{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700}
+.fcd-apt .city{font-size:.75rem;opacity:.7;margin-top:2px}
+.fcd-line{flex:1;text-align:center;padding:0 12px}
+.fcd-line .plane{font-size:1.3rem;animation:flyRight 3s ease-in-out infinite}
+@keyframes flyRight{0%,100%{transform:translateX(-8px)}50%{transform:translateX(8px)}}
+.fcd-line .dots{display:block;height:2px;background:linear-gradient(90deg,rgba(255,255,255,.1),rgba(255,255,255,.4),rgba(255,255,255,.1));border-radius:1px;margin-top:4px}
+.fcd-bottom{padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.fcd-bottom.has-gate{grid-template-columns:1fr 1fr 1fr 1fr}
+.fcd-stat{text-align:center;padding:10px 4px;background:var(--inp);border-radius:var(--rs)}
+.fcd-stat-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;color:var(--txt3);margin-bottom:4px}
+.fcd-stat-value{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700}
+.fcd-stat-sub{font-size:.7rem;color:var(--txt2);margin-top:2px}
+.fcd-stat.urgent{background:var(--errl);border:1px solid var(--err)}
+.fcd-stat.urgent .fcd-stat-value{color:var(--err)}
+.fcd-stat.boarding{background:var(--okl);border:1px solid var(--ok)}
+.fcd-stat.boarding .fcd-stat-value{color:var(--ok)}
+.fcd-stat.gate-st{background:linear-gradient(135deg,rgba(224,122,95,.1),rgba(224,122,95,.2));border:1px solid var(--acc)}
+.fcd-stat.gate-st .fcd-stat-value{color:var(--acc);font-size:1.4rem}
+.fcd-countdown-row{padding:0 16px 16px;display:flex;gap:8px}
+.fcd-cd-item{flex:1;text-align:center;padding:12px 8px;background:var(--inp);border-radius:var(--rs)}
+.fcd-cd-num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1}
+.fcd-cd-unit{font-size:.7rem;color:var(--txt3);margin-top:4px}
+
 /* Currency */
 .cud{text-align:center;padding:24px 16px;background:var(--bgc);border-radius:var(--r);box-shadow:0 2px 8px var(--shd);border:1px solid var(--brd);margin-bottom:16px}
 .cui{font-family:'Playfair Display',serif;font-size:2.5rem;font-weight:700;border:none;background:transparent;text-align:center;width:100%;color:var(--txt)}.cui:focus{outline:none}
@@ -196,7 +230,8 @@ textarea{resize:vertical;min-height:60px}
 <div class="ig"><label class="il">Nach (Stadt)</label><input type="text" id="fTC" placeholder="New York"></div>
 </div>
 <div class="ig"><label class="il">Datum</label><input type="date" id="fDt"></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+<div class="ig"><label class="il">Boarding</label><input type="time" id="fBd"></div>
 <div class="ig"><label class="il">Abflug</label><input type="time" id="fDp"></div>
 <div class="ig"><label class="il">Ankunft</label><input type="time" id="fAr"></div>
 </div>
@@ -367,17 +402,82 @@ function rDash(){
   w+=`<div class="dw"><div class="dw-i">📦</div><div class="dw-l">Gepackt</div><div class="dw-v" style="color:var(--ok)">${pc}%</div><div class="dw-s">${ck}/${tl} Items</div></div>`;
   w+=`<div class="dw"><div class="dw-i">📄</div><div class="dw-l">Dokumente</div><div class="dw-v" id="dcW">—</div><div class="dw-s">gespeichert</div></div>`;
   wg.innerHTML=w;
-  const fl=L('flights',[]),up=fl.filter(f=>f.date&&f.date>=now.toISOString().slice(0,10)).sort((a,b)=>a.date.localeCompare(b.date));
-  if(up.length){const f=up[0];const fd=new Date(f.date+'T00:00:00').toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'});nf.innerHTML=`<div class="fc" style="margin-top:4px"><div class="fch"><span class="fnr">${f.nr||'—'}</span><span class="fdt">${fd}</span></div><div class="fcb"><div class="fr"><div class="fp"><div class="code">${f.from||'—'}</div><div class="city">${f.fromCity||''}</div><div class="time">${f.dep||'—'}</div></div><div class="fl"></div><div class="fp"><div class="code">${f.to||'—'}</div><div class="city">${f.toCity||''}</div><div class="time">${f.arr||'—'}</div></div></div></div></div>`}else{nf.innerHTML=''}
-  if(trip.lat&&trip.lng)fWe(trip.lat,trip.lng);
+  const fl2=L('flights',[]),up=fl2.filter(f=>f.date&&f.date>=now.toISOString().slice(0,10)).sort((a,b)=>{const da=a.date+(a.dep||'00:00'),db=b.date+(b.dep||'00:00');return da.localeCompare(db)});
+  if(up.length){const f=up[0];nf.innerHTML=buildFlightCD(f,now)}else{nf.innerHTML=''}
+  if(trip.lat&&trip.lng&&!window._weFetched){fWe(trip.lat,trip.lng);window._weFetched=true;setTimeout(()=>{window._weFetched=false},3e5)}
   cntD();
 }
 async function cntD(){try{const a=await dA('documents');if($('dcW'))$('dcW').textContent=a.length}catch{}}
+function buildFlightCD(f,now){
+  const depDT=f.date&&f.dep?new Date(f.date+'T'+f.dep+':00'):null;
+  const bdgDT=f.date&&f.boarding?new Date(f.date+'T'+f.boarding+':00'):null;
+  const fd=f.date?new Date(f.date+'T00:00:00').toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):'—';
+
+  // Calculate countdowns
+  let depMs=depDT?(depDT-now):null;
+  let bdgMs=bdgDT?(bdgDT-now):null;
+
+  function fmtCD(ms){
+    if(ms===null)return null;
+    if(ms<=0)return{h:0,m:0,total:0,label:'Jetzt'};
+    const h=Math.floor(ms/36e5);const m=Math.floor((ms%36e5)/6e4);
+    return{h,m,total:ms,label:h>0?h+'h '+m+'min':m+'min'};
+  }
+
+  const depCD=fmtCD(depMs);
+  const bdgCD=fmtCD(bdgMs);
+
+  // Determine status
+  let status='upcoming',statusLabel='';
+  const dayDiff=depDT?Math.ceil((depDT-now)/864e5):99;
+  if(depCD&&depCD.total<=0){status='departed';statusLabel='Unterwegs ✈️'}
+  else if(bdgCD&&bdgCD.total<=0&&depCD&&depCD.total>0){status='boarding';statusLabel='Boarding! 🚶'}
+  else if(depCD&&depCD.total<72e5){status='soon';statusLabel='Bald'}// <2h
+  else if(dayDiff<=1){status='today';statusLabel='Heute'}
+  else{statusLabel='In '+dayDiff+' Tagen'}
+
+  let hasGate=!!f.gate;
+
+  let html=`<div class="fcd"><div class="fcd-top"><div class="fcd-label">Nächster Flug</div><div class="fcd-nr">${f.nr||'—'} <span class="fcd-badge">${statusLabel}</span></div><div class="fcd-route"><div class="fcd-apt"><div class="code">${f.from||'—'}</div><div class="city">${f.fromCity||''}</div></div><div class="fcd-line"><div class="plane">✈️</div><div class="dots"></div></div><div class="fcd-apt"><div class="code">${f.to||'—'}</div><div class="city">${f.toCity||''}</div></div></div><div style="font-size:.78rem;opacity:.7;margin-top:8px;text-align:center">${fd}</div></div>`;
+
+  // Countdown row only if within 48h
+  if(depCD&&depCD.total>0&&depCD.total<1728e5){
+    const dH=Math.floor(depMs/36e5),dM=Math.floor((depMs%36e5)/6e4),dS=Math.floor((depMs%6e4)/1e3);
+    html+=`<div class="fcd-countdown-row" style="padding-top:16px">`;
+    html+=`<div class="fcd-cd-item"><div class="fcd-cd-num">${String(dH).padStart(2,'0')}</div><div class="fcd-cd-unit">Stunden</div></div>`;
+    html+=`<div class="fcd-cd-item"><div class="fcd-cd-num">${String(dM).padStart(2,'0')}</div><div class="fcd-cd-unit">Minuten</div></div>`;
+    html+=`<div class="fcd-cd-item"><div class="fcd-cd-num">${String(dS).padStart(2,'0')}</div><div class="fcd-cd-unit">Sekunden</div></div>`;
+    html+=`</div>`;
+    html+=`<div style="text-align:center;font-size:.75rem;color:var(--txt3);padding:0 16px 8px">bis Abflug</div>`;
+  }
+
+  // Stats row
+  html+=`<div class="fcd-bottom${hasGate?' has-gate':''}">`;
+  if(hasGate){html+=`<div class="fcd-stat gate-st"><div class="fcd-stat-label">Gate</div><div class="fcd-stat-value">${f.gate}</div>${f.terminal?'<div class="fcd-stat-sub">Terminal '+f.terminal+'</div>':''}</div>`}
+  else if(f.terminal){html+=`<div class="fcd-stat"><div class="fcd-stat-label">Terminal</div><div class="fcd-stat-value">${f.terminal}</div></div>`}
+
+  // Boarding
+  if(f.boarding){
+    const bCls=bdgCD&&bdgCD.total<=0&&depCD&&depCD.total>0?'boarding':bdgCD&&bdgCD.total>0&&bdgCD.total<36e5?'urgent':'';
+    html+=`<div class="fcd-stat ${bCls}"><div class="fcd-stat-label">Boarding</div><div class="fcd-stat-value">${f.boarding}</div>${bdgCD&&bdgCD.total>0?'<div class="fcd-stat-sub">in '+bdgCD.label+'</div>':bdgCD&&bdgCD.total<=0?'<div class="fcd-stat-sub">Jetzt!</div>':''}</div>`;
+  }
+
+  // Departure
+  if(f.dep){
+    const dCls=depCD&&depCD.total>0&&depCD.total<36e5?'urgent':'';
+    html+=`<div class="fcd-stat ${dCls}"><div class="fcd-stat-label">Abflug</div><div class="fcd-stat-value">${f.dep}</div>${depCD&&depCD.total>0?'<div class="fcd-stat-sub">in '+depCD.label+'</div>':depCD&&depCD.total<=0?'<div class="fcd-stat-sub">Gestartet</div>':''}</div>`;
+  }
+
+  // Seat
+  if(f.seat){html+=`<div class="fcd-stat"><div class="fcd-stat-label">Sitz</div><div class="fcd-stat-value">${f.seat}</div></div>`}
+  html+=`</div></div>`;
+  return html;
+}
 async function fWe(la,ln){try{const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${la}&longitude=${ln}&current=temperature_2m,weather_code&timezone=auto`);const d=await r.json();if(d.current){$('wT').textContent=Math.round(d.current.temperature_2m)+'°C';$('wD').textContent=wLb(d.current.weather_code)}}catch{if($('wD'))$('wD').textContent='Offline'}}
 function wLb(c){const m={0:'Klar ☀️',1:'Überwiegend klar',2:'Teilw. bewölkt ⛅',3:'Bewölkt ☁️',45:'Nebel 🌫️',48:'Reifnebel',51:'Leichter Niesel',53:'Niesel',55:'Starker Niesel',61:'Leichter Regen 🌧️',63:'Regen 🌧️',65:'Starkregen',71:'Leichter Schnee ❄️',73:'Schnee ❄️',75:'Starker Schnee',80:'Schauer',85:'Schneeschauer',95:'Gewitter ⛈️'};return m[c]||'—'}
 function saveTrip(){trip={dest:$('trDest').value.trim(),date:$('trDate').value,ret:$('trRet').value,tz:$('trTZ').value,htz:$('trHTZ').value,lat:$('trLat').value,lng:$('trLng').value};S('trip',trip);rDash();toast('Reise gespeichert!')}
 function editTr(){if(trip){$('trDest').value=trip.dest||'';$('trDate').value=trip.date||'';$('trRet').value=trip.ret||'';$('trTZ').value=trip.tz||'';$('trHTZ').value=trip.htz||1;$('trLat').value=trip.lat||'';$('trLng').value=trip.lng||''}$('tripSetup').style.display='';go('home')}
-setInterval(()=>{if($('pg-home').classList.contains('ac'))rDash()},6e4);
+setInterval(()=>{if($('pg-home').classList.contains('ac'))rDash()},1000);
 
 // ═══ PACKLISTE ═══
 const DP=[{id:'clothes',name:'👕 Kleidung',items:[{id:'c1',text:'T-Shirts',checked:false},{id:'c2',text:'Hosen',checked:false},{id:'c3',text:'Unterwäsche',checked:false},{id:'c4',text:'Socken',checked:false},{id:'c5',text:'Jacke',checked:false}]},{id:'toiletries',name:'🧴 Hygiene',items:[{id:'t1',text:'Zahnbürste & Zahnpasta',checked:false},{id:'t2',text:'Shampoo',checked:false},{id:'t3',text:'Deo',checked:false},{id:'t4',text:'Sonnencreme',checked:false}]},{id:'tech',name:'📱 Technik',items:[{id:'e1',text:'Ladekabel',checked:false},{id:'e2',text:'Powerbank',checked:false},{id:'e3',text:'Kopfhörer',checked:false},{id:'e4',text:'Adapter',checked:false}]},{id:'docs',name:'📄 Dokumente',items:[{id:'d1',text:'Reisepass',checked:false},{id:'d2',text:'Führerschein',checked:false},{id:'d3',text:'Flugtickets',checked:false},{id:'d4',text:'Versicherung',checked:false}]},{id:'misc',name:'🎒 Sonstiges',items:[{id:'m1',text:'Reiseapotheke',checked:false},{id:'m2',text:'Snacks',checked:false},{id:'m3',text:'Nackenkissen',checked:false}]}];
@@ -404,11 +504,11 @@ $('dMo').addEventListener('click',e=>{if(e.target.id==='dMo')clMo()});
 
 // ═══ FLÜGE ═══
 let fl=L('flights',[]);
-function rFL(){const c=$('fList');if(!fl.length){c.innerHTML='<div style="text-align:center;padding:40px;color:var(--txt3)"><div style="font-size:3rem;margin-bottom:12px">✈️</div><p>Noch keine Flüge.</p></div>';return}const s=[...fl].sort((a,b)=>(a.date||'').localeCompare(b.date||''));let h='';s.forEach(f=>{const ri=fl.indexOf(f);const ds=f.date?new Date(f.date+'T00:00:00').toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):'—';h+=`<div class="fc"><div class="fch"><span class="fnr">${f.nr||'—'}</span><span class="fdt">${ds}</span></div><div class="fcb"><div class="fr"><div class="fp"><div class="code">${f.from||'—'}</div><div class="city">${f.fromCity||''}</div><div class="time">${f.dep||'—'}</div></div><div class="fl"></div><div class="fp"><div class="code">${f.to||'—'}</div><div class="city">${f.toCity||''}</div><div class="time">${f.arr||'—'}</div></div></div><div class="fm">${f.terminal?`<div class="fmi"><span class="fml">Terminal</span><span class="fmv">${f.terminal}</span></div>`:''}${f.gate?`<div class="fmi"><span class="fml">Gate</span><span class="fmv">${f.gate}</span></div>`:''}${f.seat?`<div class="fmi"><span class="fml">Sitz</span><span class="fmv">${f.seat}</span></div>`:''}</div>${f.notes?`<div style="margin-top:10px;font-size:.82rem;color:var(--txt2);background:var(--inp);padding:8px 12px;border-radius:8px">📝 ${f.notes}</div>`:''}<div style="display:flex;gap:8px;margin-top:12px"><button class="btn bs bsm" style="flex:1" onclick="eFl(${ri})">✏️</button><button class="btn bd bsm" style="flex:1" onclick="dFl(${ri})">🗑️</button></div></div></div>`});c.innerHTML=h}
-function saveFL(){const f={nr:$('fNr').value.trim(),from:$('fFr').value.trim().toUpperCase(),to:$('fTo').value.trim().toUpperCase(),fromCity:$('fFC').value.trim(),toCity:$('fTC').value.trim(),date:$('fDt').value,dep:$('fDp').value,arr:$('fAr').value,terminal:$('fTm').value.trim(),gate:$('fGt').value.trim(),seat:$('fSt').value.trim(),notes:$('fNt').value.trim()};if(!f.nr&&!f.from&&!f.to){toast('Bitte Flugnr. oder Route');return}const ei=$('fForm').dataset.ei;if(ei!==undefined&&ei!==''){fl[parseInt(ei)]=f;delete $('fForm').dataset.ei}else{fl.push(f)}S('flights',fl);cFL();rFL();toast('Flug gespeichert')}
-function eFl(i){const f=fl[i];$('fNr').value=f.nr||'';$('fFr').value=f.from||'';$('fTo').value=f.to||'';$('fFC').value=f.fromCity||'';$('fTC').value=f.toCity||'';$('fDt').value=f.date||'';$('fDp').value=f.dep||'';$('fAr').value=f.arr||'';$('fTm').value=f.terminal||'';$('fGt').value=f.gate||'';$('fSt').value=f.seat||'';$('fNt').value=f.notes||'';$('fForm').dataset.ei=i;$('fForm').scrollIntoView({behavior:'smooth'})}
+function rFL(){const c=$('fList');if(!fl.length){c.innerHTML='<div style="text-align:center;padding:40px;color:var(--txt3)"><div style="font-size:3rem;margin-bottom:12px">✈️</div><p>Noch keine Flüge.</p></div>';return}const s=[...fl].sort((a,b)=>(a.date||'').localeCompare(b.date||''));let h='';s.forEach(f=>{const ri=fl.indexOf(f);const ds=f.date?new Date(f.date+'T00:00:00').toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):'—';h+=`<div class="fc"><div class="fch"><span class="fnr">${f.nr||'—'}</span><span class="fdt">${ds}</span></div><div class="fcb"><div class="fr"><div class="fp"><div class="code">${f.from||'—'}</div><div class="city">${f.fromCity||''}</div><div class="time">${f.dep||'—'}</div></div><div class="fl"></div><div class="fp"><div class="code">${f.to||'—'}</div><div class="city">${f.toCity||''}</div><div class="time">${f.arr||'—'}</div></div></div><div class="fm">${f.terminal?`<div class="fmi"><span class="fml">Terminal</span><span class="fmv">${f.terminal}</span></div>`:''}${f.gate?`<div class="fmi"><span class="fml">Gate</span><span class="fmv">${f.gate}</span></div>`:''}${f.boarding?`<div class="fmi"><span class="fml">Boarding</span><span class="fmv">${f.boarding}</span></div>`:''}${f.seat?`<div class="fmi"><span class="fml">Sitz</span><span class="fmv">${f.seat}</span></div>`:''}</div>${f.notes?`<div style="margin-top:10px;font-size:.82rem;color:var(--txt2);background:var(--inp);padding:8px 12px;border-radius:8px">📝 ${f.notes}</div>`:''}<div style="display:flex;gap:8px;margin-top:12px"><button class="btn bs bsm" style="flex:1" onclick="eFl(${ri})">✏️</button><button class="btn bd bsm" style="flex:1" onclick="dFl(${ri})">🗑️</button></div></div></div>`});c.innerHTML=h}
+function saveFL(){const f={nr:$('fNr').value.trim(),from:$('fFr').value.trim().toUpperCase(),to:$('fTo').value.trim().toUpperCase(),fromCity:$('fFC').value.trim(),toCity:$('fTC').value.trim(),date:$('fDt').value,boarding:$('fBd').value,dep:$('fDp').value,arr:$('fAr').value,terminal:$('fTm').value.trim(),gate:$('fGt').value.trim(),seat:$('fSt').value.trim(),notes:$('fNt').value.trim()};if(!f.nr&&!f.from&&!f.to){toast('Bitte Flugnr. oder Route');return}const ei=$('fForm').dataset.ei;if(ei!==undefined&&ei!==''){fl[parseInt(ei)]=f;delete $('fForm').dataset.ei}else{fl.push(f)}S('flights',fl);cFL();rFL();toast('Flug gespeichert')}
+function eFl(i){const f=fl[i];$('fNr').value=f.nr||'';$('fFr').value=f.from||'';$('fTo').value=f.to||'';$('fFC').value=f.fromCity||'';$('fTC').value=f.toCity||'';$('fDt').value=f.date||'';$('fBd').value=f.boarding||'';$('fDp').value=f.dep||'';$('fAr').value=f.arr||'';$('fTm').value=f.terminal||'';$('fGt').value=f.gate||'';$('fSt').value=f.seat||'';$('fNt').value=f.notes||'';$('fForm').dataset.ei=i;$('fForm').scrollIntoView({behavior:'smooth'})}
 function dFl(i){if(confirm('Flug löschen?')){fl.splice(i,1);S('flights',fl);rFL();toast('Gelöscht')}}
-function cFL(){['fNr','fFr','fTo','fFC','fTC','fDt','fDp','fAr','fTm','fGt','fSt','fNt'].forEach(id=>$(id).value='')}
+function cFL(){['fNr','fFr','fTo','fFC','fTC','fDt','fBd','fDp','fAr','fTm','fGt','fSt','fNt'].forEach(id=>$(id).value='')}
 
 // ═══ WÄHRUNG ═══
 const CU=[{c:'EUR',n:'Euro',s:'€'},{c:'USD',n:'US Dollar',s:'$'},{c:'GBP',n:'Brit. Pfund',s:'£'},{c:'CHF',n:'Schweizer Fr.',s:'Fr'},{c:'JPY',n:'Yen',s:'¥'},{c:'CAD',n:'Kanad. Dollar',s:'C$'},{c:'AUD',n:'Austr. Dollar',s:'A$'},{c:'SEK',n:'Schwed. Krone',s:'kr'},{c:'NOK',n:'Norw. Krone',s:'kr'},{c:'DKK',n:'Dän. Krone',s:'kr'},{c:'CZK',n:'Tschech. Krone',s:'Kč'},{c:'PLN',n:'Zloty',s:'zł'},{c:'HUF',n:'Forint',s:'Ft'},{c:'TRY',n:'Türk. Lira',s:'₺'},{c:'THB',n:'Baht',s:'฿'},{c:'MXN',n:'Mex. Peso',s:'$'},{c:'BRL',n:'Real',s:'R$'},{c:'ZAR',n:'Rand',s:'R'},{c:'INR',n:'Rupie',s:'₹'},{c:'CNY',n:'Yuan',s:'¥'}];
